@@ -1,0 +1,4 @@
+bind_addr = ":8080"
+log_level = "debug"
+database_url = "postgres://fkqnfrcntplnof:1ca89be592a5d00c04631b8efc022ee27fdb1dc7dcca04161dec4bb9a1f44d48@ec2-18-214-208-89.compute-1.amazonaws.com:5432/dce686lu8je49e"
+session_key = "kekw"
