@@ -2,5 +2,5 @@ FROM golang:latest
 RUN mkdir /app
 ADD . /app/
 WORKDIR /app
-RUN go build .
+RUN go build  ./cmd/apiserver
 CMD ["/app/apiserver"]
