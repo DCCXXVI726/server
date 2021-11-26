@@ -24,7 +24,7 @@ func Start(config *Config) error {
 	if bindAddr == "" {
 		bindAddr = config.BindAddr
 	}
-	return http.ListenAndServe(bindAddr, srv)
+	return http.ListenAndServe(":" + bindAddr, srv)
 }
 
 func newDB(databaseURL string) (*sql.DB, error) {
