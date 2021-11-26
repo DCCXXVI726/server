@@ -1,9 +1,10 @@
-package src
+package main
 
 import (
 	"fmt"
 	"net/http"
 	"os"
+	"log"
 )
 
 func homePage(w http.ResponseWriter, r *http.Request) {
@@ -14,9 +15,9 @@ func handleRequest() {
 	http.HandleFunc("/", homePage)
 	bindAddr :=  os.Getenv("PORT")
 	if bindAddr == "" {
-		bindAddr = "8080"
+		bindAddr = "8081"
 	}
-	http.ListenAndServe(":" + bindAddr, nil)
+	log.Fatal(http.ListenAndServe(":" + bindAddr, nil))
 }
 
 func main() {
