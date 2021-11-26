@@ -20,8 +20,8 @@ func Start(config *Config) error {
 	sessionStore := sessions.NewCookieStore([]byte(config.SessionKey))
 	srv := newServer(store, sessionStore)
 
-	bindAddr, ok := os.LookupEnv("PORT")
-	if ok == false {
+	bindAddr :=  os.Getenv("PORT")
+	if bindAddr == "" {
 		bindAddr = config.BindAddr
 	}
 	return http.ListenAndServe(bindAddr, srv)

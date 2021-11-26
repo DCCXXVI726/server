@@ -3,4 +3,4 @@ RUN mkdir /app
 ADD . /app/
 WORKDIR /app
 RUN go build  ./cmd/apiserver
-CMD ["/app/apiserver"]
+CMD ./apiserver
