@@ -16,5 +16,9 @@ func handleRequest() {
 	if bindAddr == "" {
 		bindAddr = "8080"
 	}
-	http.ListenAndServe(":"+bindAddr, nil)
+	http.ListenAndServe(":" + bindAddr, nil)
+}
+
+func main() {
+	handleRequest()
 }
