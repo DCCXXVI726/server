@@ -21,8 +21,7 @@ func NewServer() *ApiServer {
 }
 
 func (s *ApiServer) Start() error {
-	err := s.configureLogger()
-	if err != nil {
+	if err := s.configureLogger(); err != nil {
 		return fmt.Errorf("can't configure logger: %s", err)
 	}
 
