@@ -22,11 +22,11 @@ func NewStore() *Store {
 
 func (s *Store) all() (int, string) {
 	var (
-		id   int
-		user string
+		id    int
+		email string
 	)
-	s.db.QueryRow("select user, id from users LIMIT 1").Scan(&id, &user)
-	return id, user
+	s.db.QueryRow("select id, email from users LIMIT 1").Scan(&id, &email)
+	return id, email
 }
 
 func (s *Store) Open() error {

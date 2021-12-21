@@ -73,6 +73,7 @@ func (s *ApiServer) configureStore() error {
 func (s *ApiServer) handleHome() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		_, user := s.store.all()
+		s.logger.Info(user)
 		fmt.Fprintf(w, "Welcome to homePage!"+user)
 	}
 }
