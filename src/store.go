@@ -7,11 +7,6 @@ import (
 	"os"
 )
 
-type User struct {
-	Email string
-	Pass  string
-	ID    int
-}
 type Store struct {
 	db *sql.DB
 }
@@ -20,13 +15,24 @@ func NewStore() *Store {
 	return &Store{}
 }
 
-func (s *Store) all() (int, string) {
-	var (
-		id    int
-		email string
-	)
-	s.db.QueryRow("select id, email from users LIMIT 1").Scan(&id, &email)
-	return id, email
+func (s *Store) FindUserByEmail(email string) (User, error) {
+	var user User
+	if err := s.db.QueryRow(
+		"select id, email, encrypted_password from users where email = $1",
+		email,
+	).Scan(
+		&user.Id,
+		&user.Email,
+		&user.EncryptedPassword,
+	); err != nil {
+		return User{}, fmt.Errorf("can't find user with email %s : %s", email, err)
+	}
+	return user, nil
+}
+
+func (s *Store) CreateUser(user User) error {
+
+	return nil
 }
 
 func (s *Store) Open() error {

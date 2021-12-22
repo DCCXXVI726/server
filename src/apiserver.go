@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"net/smtp"
 	"os"
 )
 
@@ -60,7 +62,8 @@ func (s *ApiServer) configureLogger() error {
 
 func (s *ApiServer) configureRouting() {
 	s.router.HandleFunc("/", s.handleHome())
-	s.router.HandleFunc("/registration", s.handleRegistration())
+	s.router.HandleFunc("/registration", s.handleRegistration()).Methods("POST")
+	s.router.HandleFunc("/confirm", s.handleConfirmEmail()).Queries("email", "{email}")
 }
 
 func (s *ApiServer) configureStore() error {
@@ -69,17 +72,59 @@ func (s *ApiServer) configureStore() error {
 	}
 	return nil
 }
-
+func (s *ApiServer) handleConfirmEmail() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
 func (s *ApiServer) handleHome() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, user := s.store.all()
-		s.logger.Info(user)
-		fmt.Fprintf(w, "Welcome to homePage!"+user)
+		fmt.Fprintf(w, "Welcome to homePage!")
 	}
 }
 
 func (s *ApiServer) handleRegistration() http.HandlerFunc {
+	type request struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		var rec request
+		if err := json.NewDecoder(r.Body).Decode(&rec); err != nil {
+			err = fmt.Errorf("can't encode body in registration: %s", err)
+			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
+		}
+		if _, err := s.store.FindUserByEmail(rec.Email); err == nil {
+			err = fmt.Errorf("user with email %s already registered", rec.Email)
+			s.error(w, r, http.StatusConflict, err)
+			return
+		}
+		from := "DCCXXVI726726@gmail.com"
+		pass := os.Getenv("EMAIL_PASS")
+		to := []string{rec.Email}
+		smtpHost := "smtp.gmail.com"
+		smtpPort := "587"
 
+		message := []byte("My super secret message.")
+
+		auth := smtp.PlainAuth("", from, pass, smtpHost)
+
+		err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
+		if err != nil {
+			s.error(w, r, http.StatusConflict, err)
+			return
+		}
+		s.respond(w, r, 404, map[string]string{"OK": "OK"})
+	}
+}
+
+func (s *ApiServer) error(w http.ResponseWriter, r *http.Request, code int, err error) {
+	s.respond(w, r, code, map[string]string{"error": err.Error()})
+}
+
+func (s *ApiServer) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
+	w.WriteHeader(code)
+	if data != nil {
+		json.NewEncoder(w).Encode(data)
 	}
 }
